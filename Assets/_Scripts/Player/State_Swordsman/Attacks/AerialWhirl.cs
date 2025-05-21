@@ -1,0 +1,29 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class AerialWhirl : MeleeBaseState
+{
+    public override void OnEnter(StateMachine stateMachine)
+    {
+        base.OnEnter(stateMachine);
+
+        _attackIndex = 8;
+        _duration = 0.5f;
+        _animator.SetTrigger("Attack" + _attackIndex);
+        _playerMovement.IsAirAttacking(true);
+        Debug.Log("Player attack " + _attackIndex + " launched");
+    }
+
+    // Update is called once per frame
+    public override void OnUpdate()
+    {
+        base.OnUpdate();
+
+        if (fixedtime >= _duration)
+        {
+            _playerMovement.IsAirAttacking(false);
+            stateMachine.SetNextStateToMain();
+        }
+    }
+}

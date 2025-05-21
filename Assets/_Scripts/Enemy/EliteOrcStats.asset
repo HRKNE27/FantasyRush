@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b15c2fea04ff01a428834896bf206d48, type: 3}
+  m_Name: EliteOrcStats
+  m_EditorClassIdentifier: 
+  MaxWalkSpeed: 5
+  MaxRunSpeed: 10
+  Acceleration: 0.5
+  JumpForce: 5
+  DetectionRange: 7
+  DisengageRange: 10
+  Health: 500
+  BarrierDamageReduction: 0.6
+  BarrierThreshold: 100
+  StunDuration: 5
+  DeathDuration: 3
+  Damage: 10
+  AttackNumber: 3
+  CriticalChance: 0.01
+  CriticalDamage: 1
+  AttackCooldown: 2
+  AttackDelay: 0.5
+  AttackRadius: 0.1
+  ParryDuration: 5
+  ParryWindow: 3
