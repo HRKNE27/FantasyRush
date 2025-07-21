@@ -10,6 +10,7 @@ public class AerialSlashDown : MeleeBaseState
 
         _attackIndex = 11;
         _duration = 0.5f;
+        _attackDamage = 25;
         _animator.SetTrigger("Attack" + _attackIndex);
         _playerMovement.IsAirAttacking(true);
         Debug.Log("Player attack " + _attackIndex + " launched");

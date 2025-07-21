@@ -12,7 +12,7 @@ public class GroundComboFollowState : MeleeBaseState
         _duration = 0.286f;
         _attackDamage = 70;
         _animator.SetTrigger("Attack" + _attackIndex);
-        _playerMovement.IsGroundAttacking(true);
+        _playerMovement.IsGroundAttacking(false);
         Debug.Log("Player attack " + _attackIndex + " launched");
     }
 

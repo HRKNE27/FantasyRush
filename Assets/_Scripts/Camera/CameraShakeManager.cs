@@ -7,10 +7,20 @@ public class CameraShakeManager : MonoBehaviour
 {
     public static CameraShakeManager Instance;
 
-    [SerializeField] private float globalShakeForce = 0.5f;
+    [SerializeField] private float globalLightShakeForce = 0.25f;
+    [SerializeField] private float globalMediumShakeForce = 0.5f;
+    [SerializeField] private float globalHeavyShakeForce = 0.75f;
     [SerializeField] private CinemachineImpulseListener impulseListener;
 
     private CinemachineImpulseDefinition impulseDefinition;
+    public static GeneralShakeIntensity shakeIntensity;
+
+    public enum GeneralShakeIntensity
+    {
+        Light,
+        Medium,
+        Heavy
+    }
 
     private void Awake()
     {
@@ -24,9 +34,24 @@ public class CameraShakeManager : MonoBehaviour
         }
     }
 
-    public void CameraShake(CinemachineImpulseSource impulseSource)
+    public void CameraShake(CinemachineImpulseSource impulseSource, GeneralShakeIntensity generalShakeIntensity = GeneralShakeIntensity.Medium)
     {
-        impulseSource.GenerateImpulseWithForce(globalShakeForce);
+        switch (generalShakeIntensity)
+        {
+            case GeneralShakeIntensity.Light:
+                impulseSource.GenerateImpulseWithForce(globalLightShakeForce);
+                break;
+            case GeneralShakeIntensity.Medium:
+                impulseSource.GenerateImpulseWithForce(globalLightShakeForce);
+                break;
+            case GeneralShakeIntensity.Heavy:
+                impulseSource.GenerateImpulseWithForce(globalLightShakeForce);
+                break;
+            default:
+                impulseSource.GenerateImpulseWithForce(globalMediumShakeForce);
+                break;
+        }
+        
     }
 
     public void ScreenShakeFromProfile(ScreenShakeProfile profile, CinemachineImpulseSource impulseSource)
@@ -49,4 +74,6 @@ public class CameraShakeManager : MonoBehaviour
         impulseListener.m_ReactionSettings.m_FrequencyGain = profile.listenerFrequency;
         impulseListener.m_ReactionSettings.m_Duration = profile.listenerDuration;
     }
+
+    
 }

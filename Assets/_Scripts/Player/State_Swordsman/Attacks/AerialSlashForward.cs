@@ -10,6 +10,7 @@ public class AerialSlashForward : MeleeBaseState
 
         _attackIndex = 9;
         _duration = 0.625f;
+        _attackDamage = 25;
         _animator.SetTrigger("Attack" + _attackIndex);
         _playerMovement.IsAirAttacking(true);
         Debug.Log("Player attack " + _attackIndex + " launched");

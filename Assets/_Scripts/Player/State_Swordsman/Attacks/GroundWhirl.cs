@@ -10,8 +10,9 @@ public class GroundWhirl : MeleeBaseState
 
         _attackIndex = 7;
         _duration = 0.9f;
+        _attackDamage = 25;
         _animator.SetTrigger("Attack" + _attackIndex);
-        _playerMovement.IsGroundAttacking(true);
+        _playerMovement.IsGroundAttacking(false);
         Debug.Log("Player attack " + _attackIndex + " launched");
     }
 

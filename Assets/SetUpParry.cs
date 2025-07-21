@@ -10,7 +10,9 @@ public class SetUpParry : MonoBehaviour
     [SerializeField] private GameObject parryBar;
     [SerializeField] private GameObject pointA;
     [SerializeField] private GameObject pointB;
-    public EnemyStats enemyStats;
+
+    [SerializeField] private EnemyAI enemyAI;
+    [SerializeField] private EnemyStats enemyStats;
 
     private List<int> parryTimeSet;
     private Vector3 lastPosition;
@@ -21,6 +23,7 @@ public class SetUpParry : MonoBehaviour
     /*private void Start()
     {
         SetParryWindow();
+        elapsedTime = 0f;
         parryCounter.transform.position = pointA.transform.position;
         lastPosition = pointA.transform.position;
         moveCoroutine = StartCoroutine(MoveParryCounter());
@@ -34,10 +37,17 @@ public class SetUpParry : MonoBehaviour
         moveCoroutine = StartCoroutine(MoveParryCounter());
     }
 
+    private void OnDisable()
+    {
+        distanceTravled = 0f;
+        elapsedTime = 0f;
+        ResetParryBar(); 
+    }
+
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
-            CheckSuccess();
+        // if (Input.GetKeyDown(KeyCode.Space))
+            // CheckSuccess();
     }
 
     private void SetParryWindow()
@@ -53,9 +63,7 @@ public class SetUpParry : MonoBehaviour
             selectedIndexes.Add(availibleIndexes[randomIndex] + 1);
             Transform randomChild = parryBar.transform.GetChild(availibleIndexes[randomIndex]);
             randomChild.GetComponent<SpriteRenderer>().color = Color.red;
-            Debug.Log(availibleIndexes[randomIndex]);
-            availibleIndexes.RemoveAt(randomIndex);
-            
+            availibleIndexes.RemoveAt(randomIndex);      
         }
         parryTimeSet = selectedIndexes;
     }
@@ -64,12 +72,10 @@ public class SetUpParry : MonoBehaviour
     {
         StopCoroutine(moveCoroutine);
         float parryPercentage = distanceTravled / Vector3.Distance(pointA.transform.position, pointB.transform.position);
-        Debug.Log(parryPercentage);
         foreach (int x in parryTimeSet)
         {
             float startPercent = (x - 1) / 10f;
             float endPercent = x / 10f;
-            Debug.Log(startPercent.ToString() + " - " + endPercent.ToString());
             if (CheckSuccess(parryPercentage, startPercent, endPercent))
                 return;
         }
@@ -94,12 +100,21 @@ public class SetUpParry : MonoBehaviour
 
         distanceTravled += Vector3.Distance(parryCounter.transform.position, pointB.transform.position);
         parryCounter.transform.position = pointB.transform.position;
-        Debug.Log("Launch attack");
+        StartCoroutine(enemyAI.AttackSequence());
+        // transform.gameObject.SetActive(false);
+    }
+
+    private void ResetParryBar()
+    {
+        foreach(int x in parryTimeSet)
+        {
+            Transform child = parryBar.transform.GetChild(x - 1);
+            child.GetComponent<SpriteRenderer>().color = Color.white;
+        }
     }
 
     public static bool CheckSuccess(float number, float min, float max)
     {
-        Debug.Log(number >= min && number <= max);
         return number >= min && number <= max;
     }
 }

@@ -1,3 +1,4 @@
+using Cinemachine;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,11 +6,18 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
     [Header("References")]
-    public PlayerMovementStats MoveStats;
+    public PlayerStats MoveStats;
     [SerializeField] private Collider2D _feetColl;
     [SerializeField] private Collider2D _bodyColl;
-    private Animator _animator;
+    private SpriteRenderer _spriteRenderer;
+    private PartyMemberController _partyMemberController;
 
+    [Header("AfterImage")]
+    [SerializeField] private GameObject _afterImageGameObject;
+    private bool _canCreateAfterImage;
+
+    private CinemachineImpulseSource _impulseSource;
+    private Animator _animator;
     private Rigidbody2D _rb;
 
     // Party Vars
@@ -18,6 +26,7 @@ public class PlayerMovement : MonoBehaviour
     // Movement Vars
     public float HorizontalVelocity { get; private set; }
     public bool _isFacingRight { get; private set; }
+    public bool _canAct;
 
     // Collision Vars
     private RaycastHit2D _groundHit;
@@ -88,67 +97,93 @@ public class PlayerMovement : MonoBehaviour
         _isFacingRight = true;
         _rb = GetComponent<Rigidbody2D>();
         _animator = GetComponent<Animator>();
+        _spriteRenderer = GetComponent<SpriteRenderer>();
+        _impulseSource = GetComponent<CinemachineImpulseSource>();
+        _partyMemberController = GetComponent<PartyMemberController>();
         _isGroundAttacking = false;
         _isAirAttacking = false;
+        _canAct = true;
+        _canCreateAfterImage = true;
     }
 
     private void Update()
     {
-        CountTimers();
-        JumpChecks();
-        LandCheck();
-        WallSlideCheck();
-        WallJumpCheck();
-        DashCheck();
+        if (_canAct)
+        {
+            CountTimers();
+            JumpChecks();
+            LandCheck();
+            WallSlideCheck();
+            WallJumpCheck();
+            DashCheck();
+        } 
     }
 
     private void FixedUpdate()
     {
-        CollisionChecks();
-        Jump();
-        Fall();
-        WallSlide();
-        WallJump();
-        Dash();
+        if (_canAct)
+        {
+            CollisionChecks();
+            Jump();
+            Fall();
+            WallSlide();
+            WallJump();
+            Dash();
 
-        if (_isGrounded)
-        {
-            Move(MoveStats.GroundAcceleration, MoveStats.GroundDeceleration, InputManager.Movement);
-        }
-        else
-        {
-            if (_useWallJumpMoveStats)
+            if (_isGrounded)
             {
-                Move(MoveStats.WallJumpMoveAcceleration, MoveStats.WallJumpMoveDeveleration, InputManager.Movement);
+                Move(MoveStats.GroundAcceleration, MoveStats.GroundDeceleration, InputManager.Movement);
             }
             else
             {
-                Move(MoveStats.AirAcceleration, MoveStats.AirDeceleration, InputManager.Movement);
+                if (_useWallJumpMoveStats)
+                {
+                    Move(MoveStats.WallJumpMoveAcceleration, MoveStats.WallJumpMoveDeveleration, InputManager.Movement);
+                }
+                else
+                {
+                    Move(MoveStats.AirAcceleration, MoveStats.AirDeceleration, InputManager.Movement);
+                }
+
             }
-            
-        }
-        ApplyVelocity();
+            ApplyVelocity();
+        }       
     }
 
     private void ApplyVelocity()
     {
-        if (!_isDashing && !_isGroundAttacking)
+        if (!_isDashing)
         {
             VerticalVelocity = Mathf.Clamp(VerticalVelocity, -MoveStats.MaxFallSpeed, 50f);
         }
         else
         {
             VerticalVelocity = Mathf.Clamp(VerticalVelocity, -50f, 50f);
+
+            if (_canCreateAfterImage)
+            {
+                GameObject afterImageObj = ObjectPoolManager.SpawnObject(_afterImageGameObject, gameObject.transform.position, gameObject.transform.rotation, ObjectPoolManager.PoolType.Sprites);
+                afterImageObj.GetComponent<SpriteRenderer>().sprite = _spriteRenderer.sprite;
+                StartCoroutine(CreateAfterImageCooldown());
+            }
         }
 
         if (!_isGroundAttacking)
         {
-            _rb.velocity = new Vector2(HorizontalVelocity, VerticalVelocity);
+            _rb.velocity = new Vector2(HorizontalVelocity * MoveStats.MovementReductionAttack, VerticalVelocity);
         }
         else
         {
-            _rb.velocity = new Vector2(0f, VerticalVelocity);
+            _rb.velocity = Vector2.zero;
         }
+        
+    }
+
+    private IEnumerator CreateAfterImageCooldown()
+    {
+        _canCreateAfterImage = false;
+        yield return new WaitForSeconds(0.01f);
+        _canCreateAfterImage = true;
     }
 
     public void SetVelocities(float horizontal, float vertical)
@@ -741,9 +776,18 @@ public class PlayerMovement : MonoBehaviour
         _dashTimer = 0f;
         _dashOnGroundTimer = MoveStats.TimeBtwDashesOnGround;
 
+        CameraShakeManager.Instance.CameraShake(_impulseSource, CameraShakeManager.GeneralShakeIntensity.Light);
+        StartCoroutine(DelayInvincibilityFromDash(MoveStats.DelayedDashInvincibility));
+
         ResetJumpValues();
         ResetWallJumpValues();
         StopWallSlide();
+    }
+
+    private IEnumerator DelayInvincibilityFromDash(float timeDelay)
+    {
+        yield return new WaitForSeconds(timeDelay);
+        _partyMemberController.InitiateInvincibility(MoveStats.DashInvincibilityTimeFrame);
     }
 
     private void Dash()

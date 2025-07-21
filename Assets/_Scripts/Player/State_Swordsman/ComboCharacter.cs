@@ -61,7 +61,7 @@ public class ComboCharacter : MonoBehaviour
             if (_playerMovement._isGrounded)
             {
                 _playerMovement.IsGroundAttacking(true);
-                _meleeStateMachine.SetNextState(new Parry());
+                _meleeStateMachine.SetNextState(new HeavySlash());
             }
         }
 
@@ -70,7 +70,7 @@ public class ComboCharacter : MonoBehaviour
             if (_playerMovement._isGrounded)
             {
                 _playerMovement.IsGroundAttacking(true);
-                _meleeStateMachine.SetNextState(new HeavySlash());
+                _meleeStateMachine.SetNextState(new Parry());
             }
         }
     }

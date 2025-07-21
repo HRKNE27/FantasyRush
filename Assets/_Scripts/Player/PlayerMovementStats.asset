@@ -9,9 +9,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a8d35552c27dd2a449cef2fbb802473c, type: 3}
+  m_Script: {fileID: 11500000, guid: 539a98128a6ca2d4fa1a4ab9a24f7fdc, type: 3}
   m_Name: PlayerMovementStats
   m_EditorClassIdentifier: 
+  PhysicalDamage: 1
+  MagicDamage: 1
+  CritChance: 0.1
+  CritDamage: 1.5
+  Mana: 100
+  ManaRegenerationPerSec: 0.33
+  Health: 100
+  Defence: 0.5
+  KnockBack: 1
+  Stamina: 100
+  StaminaRegenerationPerSec: 0.5
+  InvincibleTimeFrame: 0.3
   MoveThreshold: 0.25
   MaxWalkSpeed: 10
   GroundAcceleration: 10
@@ -46,7 +58,9 @@ MonoBehaviour:
   WallJumpDirection: {x: -20, y: 6.5}
   WallJumpPostBufferTime: 0.125
   WallJumpGravityOnReleaseMultiplier: 1
-  DashTime: 0.15
+  DashTime: 0.2
+  DelayedDashInvincibility: 0.05
+  DashInvincibilityTimeFrame: 0.1
   DashSpeed: 30
   TimeBtwDashesOnGround: 0.225
   ResetDashOnWallSlide: 1
@@ -54,6 +68,7 @@ MonoBehaviour:
   DashDiagonallyBias: 0.4
   DashGravityOnReleaseMultiplier: 1
   DashTimeForUpwardsCancel: 0.027
+  MovementReductionAttack: 0.75
   DebugShowIsGroundedBox: 0
   DebugShowHeadBumpBox: 0
   DebugShowWallHitBox: 0

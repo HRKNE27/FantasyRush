@@ -1,5 +1,6 @@
 using Pathfinding;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting;
 using UnityEditor.EditorTools;
@@ -34,6 +35,13 @@ public class EnemyAI : Monster
     private bool ignorePlayer;
     public bool canAct;
 
+    [Header("Combat")]
+    [SerializeField] private Collider2D _hitCollider;
+    private List<Collider2D> _collidersDamaged;
+
+    [Header("Misc")]
+    [SerializeField] private GameObject parryCanvas;
+
     [Space(10)]
     private Path path;
     private int currentWaypoint = 0;
@@ -47,6 +55,7 @@ public class EnemyAI : Monster
         base.Start();
         seeker = GetComponent<Seeker>();
         _anim = GetComponent<Animator>();
+        _collidersDamaged = new List<Collider2D>();
 
         movingRight = true;
         isJumping = false;
@@ -65,9 +74,9 @@ public class EnemyAI : Monster
         {
             if (TargetInAttackDistance())
             {
-                StartCoroutine(AttackSequence());
+                parryCanvas.SetActive(true);
             }
-            else if (TargetInDistance() && followEnabled && canAttack && !ignorePlayer)
+            else if (TargetInDistance() && followEnabled && canAttack)
             {
                 PathFollow();
             }
@@ -78,30 +87,24 @@ public class EnemyAI : Monster
         }
     }
 
-    private IEnumerator AttackSequence()
-    {
+    public IEnumerator AttackSequence()
+    {     
         canAttack = false;
-
         float attackNumber = Random.Range(1, enemyStats.AttackNumber+1);
-
-        // Slight delay before attack (give player a chance to react)
-        yield return new WaitForSeconds(attackDelay);
         _anim.SetTrigger("Attack" + attackNumber);
-        FacePlayer();
+
         isAttacking = true;
+        Attack();
 
-        // Swap to idle animation after delay
-        yield return null;
-        yield return new WaitForSeconds(_anim.GetCurrentAnimatorClipInfo(0)[0].clip.length);
-        _anim.SetFloat("MoveSpeed", 0);
-
-        // Start moving after your attack cooldown
         yield return new WaitForSeconds(enemyStats.AttackCooldown);
-
         if (TargetInAttackDistance()) _anim.Play("Idle");
         else _anim.Play("Walk");
 
         canAttack = true;
+        parryCanvas.SetActive(false);
+        isAttacking = false;
+
+        // yield return null;
     }
 
     public void Attack() => StartCoroutine(RegisterAttack());
@@ -110,13 +113,37 @@ public class EnemyAI : Monster
     {
         while (isAttacking)
         {
-            Collider2D[] hitObjects = Physics2D.OverlapCircleAll(attackArea.position, attackRadius);
-            if (hitObjects.Any(obj => obj.CompareTag("Player")))
+            Collider2D[] collidersToDamage = new Collider2D[10];
+            ContactFilter2D filter = new ContactFilter2D();
+            filter.useTriggers = true;
+            int colliderCount = Physics2D.OverlapCollider(_hitCollider, filter, collidersToDamage);
+            for (int i = 0; i < colliderCount; i++)
             {
-                yield break;
+                
+                if (collidersToDamage[i].transform.parent.gameObject.layer == LayerMask.NameToLayer("Player"))
+                {
+                    Debug.Log(FindParent(collidersToDamage[i])?.name);
+                    if (movingRight)
+                    {
+                        FindParent(collidersToDamage[i]).GetComponent<PartyMemberController>().TakeDamage(enemyStats.Damage,Vector2.right);
+                    }
+                    else
+                    {
+                        FindParent(collidersToDamage[i]).GetComponent<PartyMemberController>().TakeDamage(enemyStats.Damage,Vector2.left);
+                    }
+                    // FindParent(collidersToDamage[i]).GetComponent<PartyMemberController>().TakeDamage();
+                    yield break;
+                }
             }
+
             yield return null;
         }
+
+    }
+
+    private GameObject FindParent(Collider2D collider2D)
+    {
+        return collider2D.transform.parent.gameObject.transform.parent.gameObject;
     }
 
     private void Move()
@@ -152,26 +179,19 @@ public class EnemyAI : Monster
         Vector2 force = direction * speed;
         Vector2 currentVelocity = rb.velocity;
 
-        if(direction.y <= 1.0f)
-        {
-            Jump(direction);
+        Jump(direction);
 
-            rb.velocity = Vector2.SmoothDamp(rb.velocity, force, ref currentVelocity, acceleration);
+        float distance = Vector2.Distance(rb.position, path.vectorPath[currentWaypoint]);
 
-            float distance = Vector2.Distance(rb.position, path.vectorPath[currentWaypoint]);
+        if (distance < nextWaypoint) currentWaypoint++;
 
-            if (distance < nextWaypoint) currentWaypoint++;
+        if (rb.velocity.x > 0f && !movingRight) TurnAround();
+        else if (rb.velocity.x < 0f && movingRight) TurnAround();
 
-            if (rb.velocity.x > 0.5f && !movingRight) TurnAround();
-            else if (rb.velocity.x < 0.5f && movingRight) TurnAround();
-
-            _anim.SetFloat("MoveSpeed", Mathf.Abs(rb.velocity.x));
-        }
-        else
-        {
-            Move();
-        }
+        rb.velocity = Vector2.SmoothDamp(rb.velocity, force, ref currentVelocity, acceleration);
         
+        
+
     }
 
     private void Jump(Vector2 direction)
@@ -206,11 +226,11 @@ public class EnemyAI : Monster
     {
         if (isAggroed)
         {
-            return isAggroed = Vector2.Distance(transform.position, target.transform.position) < disengageRange;
+            return isAggroed = Vector2.Distance(transform.position, target.transform.position) < aggroRange;
         }
         else
         {
-            return isAggroed = Vector2.Distance(transform.position, target.transform.position) < aggroRange;
+            return isAggroed = Vector2.Distance(transform.position, target.transform.position) < disengageRange;
         }
     }
 

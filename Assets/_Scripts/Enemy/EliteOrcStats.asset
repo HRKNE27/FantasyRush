@@ -18,7 +18,7 @@ MonoBehaviour:
   JumpForce: 5
   DetectionRange: 7
   DisengageRange: 10
-  Health: 500
+  Health: 200
   BarrierDamageReduction: 0.6
   BarrierThreshold: 100
   StunDuration: 5
@@ -30,5 +30,5 @@ MonoBehaviour:
   AttackCooldown: 2
   AttackDelay: 0.5
   AttackRadius: 0.1
-  ParryDuration: 5
+  ParryDuration: 2
   ParryWindow: 3

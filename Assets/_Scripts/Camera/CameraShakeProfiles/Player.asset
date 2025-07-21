@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 18e56a91923ceed478a081e0d51dacdd, type: 3}
-  m_Name: EliteOrc
+  m_Name: Player
   m_EditorClassIdentifier: 
-  impactTime: 0.1
-  impactForce: 5
+  impactTime: 0.2
+  impactForce: 10
   defaultVelocity: {x: 0.1, y: 0.1, z: 0}
   impulseCurve:
     serializedVersion: 2
@@ -21,35 +21,44 @@ MonoBehaviour:
     - serializedVersion: 3
       time: 0
       value: 0
-      inSlope: 0.94096565
-      outSlope: 0.94096565
+      inSlope: 2.1225014
+      outSlope: 2.1225014
       tangentMode: 34
       weightedMode: 0
       inWeight: 0
       outWeight: 0.33333334
     - serializedVersion: 3
-      time: 0.12498641
-      value: 0.11760792
-      inSlope: 0.40592945
-      outSlope: 0.40592945
+      time: 0.20457402
+      value: 0.43420863
+      inSlope: 1.2165884
+      outSlope: 1.2165884
       tangentMode: 34
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
     - serializedVersion: 3
-      time: 0.68184507
-      value: 0.045713723
-      inSlope: -0.19959053
-      outSlope: -0.19959053
-      tangentMode: 0
+      time: 0.38624692
+      value: 0.49064994
+      inSlope: -0.20784014
+      outSlope: -0.20784014
+      tangentMode: 34
       weightedMode: 0
-      inWeight: 0.21427658
+      inWeight: 0.33333334
       outWeight: 0.33333334
     - serializedVersion: 3
-      time: 1
-      value: 0
-      inSlope: -0.14368384
-      outSlope: -0.14368384
+      time: 0.5585986
+      value: 0.36546132
+      inSlope: -0.5118483
+      outSlope: -0.5118483
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.92738736
+      value: 0.25580537
+      inSlope: -0.29734078
+      outSlope: -0.29734078
       tangentMode: 34
       weightedMode: 0
       inWeight: 0.33333334

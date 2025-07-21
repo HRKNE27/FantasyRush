@@ -10,6 +10,7 @@ public class GroundComboFinisherUp : MeleeBaseState
 
         _attackIndex = 4;
         _duration = 0.4f;
+        _attackDamage = 25;
         _animator.SetTrigger("Attack" + _attackIndex);
         _playerMovement.IsGroundAttacking(true);
         Debug.Log("Player attack " + _attackIndex + " launched");

@@ -17,18 +17,28 @@ public class Dissolve : MonoBehaviour
     {
         _spriteRenderer = GetComponent<SpriteRenderer>();
         _material = GetComponent<Renderer>().material;
-        _enemyAI = GetComponent<EnemyAI>();
+        // _enemyAI = GetComponent<EnemyAI>();
         _deathCheck = true;
     }
 
-    public void CallVanish()
+    public void CallVanish(GameObject gameObject)
     {
         if (_deathCheck)
         {
-            StartCoroutine(Vanish());
+            StartCoroutine(Vanish(gameObject));
             _deathCheck = false;
         }
         
+    }
+
+    public void CallVanishPlayer(GameObject gameObject)
+    {
+        if (_deathCheck)
+        {
+            StartCoroutine(VanishPlayer(gameObject));
+            _deathCheck = false;
+        }
+
     }
 
     public void CallAppear()
@@ -36,7 +46,7 @@ public class Dissolve : MonoBehaviour
         StartCoroutine(Appear());
     }
 
-    private IEnumerator Vanish()
+    private IEnumerator Vanish(GameObject g)
     {
         float elapsedTime = 0f;
         while(elapsedTime <= _dissolveTime)
@@ -46,8 +56,23 @@ public class Dissolve : MonoBehaviour
             _material.SetFloat(_dissolveAmount, lerpedDissolve);
             yield return null;
         }
-        if(elapsedTime > _dissolveTime)
-            _enemyAI.MonsterDie();
+        if (elapsedTime > _dissolveTime)
+            Destroy(g);
+        yield return null;
+    }
+
+    private IEnumerator VanishPlayer(GameObject g)
+    {
+        float elapsedTime = 0f;
+        while (elapsedTime <= _dissolveTime)
+        {
+            elapsedTime += Time.deltaTime;
+            float lerpedDissolve = Mathf.Lerp(1f, 0f, (elapsedTime / _dissolveTime));
+            _material.SetFloat(_dissolveAmount, lerpedDissolve);
+            yield return null;
+        }
+        if (elapsedTime > _dissolveTime)
+            PartyController.Instance.LeaderDeathUpdate();
         yield return null;
     }
 

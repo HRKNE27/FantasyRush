@@ -10,6 +10,7 @@ public class HeavySlash : MeleeBaseState
 
         _attackIndex = 13;
         _duration = 1.25f;
+        _attackDamage = 25;
         _animator.SetTrigger("Attack" + _attackIndex);
         _playerMovement.IsGroundAttacking(true);
         Debug.Log("Player attack " + _attackIndex + " launched");

@@ -20,7 +20,7 @@ public class EnemyController : MonoBehaviour
 
     private int currentHealth;
     private int currentBarrier;
-    private bool alive;
+    private bool isAlive;
 
     private void Awake()
     {
@@ -34,7 +34,7 @@ public class EnemyController : MonoBehaviour
     {
         currentHealth = enemyStats.Health;
         currentBarrier = enemyStats.BarrierThreshold;
-        alive = true;
+        isAlive = true;
     }
 
     void Update()
@@ -58,7 +58,7 @@ public class EnemyController : MonoBehaviour
             // Debug.Log(transform.gameObject.name + " has taken " + incomingDamage.ToString());
         }
         SpawnDamageParticles(attackDirection);
-        CameraShakeManager.Instance.CameraShake(_impulseSource);
+        // CameraShakeManager.Instance.CameraShake(_impulseSource);
         CameraShakeManager.Instance.ScreenShakeFromProfile(screenShakeProfile, _impulseSource);
     }
 
@@ -77,13 +77,23 @@ public class EnemyController : MonoBehaviour
             StopAllCoroutines();
             _enemyAI.StopAllCoroutines();
             StartCoroutine(DeathSequence());
-            alive = false;
+            isAlive = false;
         }
     }
 
     private void SpawnDamageParticles(Vector2 attackDirection)
     {
-        Quaternion spawnRotation = Quaternion.FromToRotation(Vector2.right, attackDirection);
+        Debug.Log(attackDirection);
+        Quaternion spawnRotation;
+        if (attackDirection.x > 0)
+        {
+            spawnRotation = Quaternion.FromToRotation(Vector2.left, -attackDirection);
+        }
+        else
+        {
+            spawnRotation = Quaternion.FromToRotation(Vector2.right, attackDirection);
+        }
+        
         damageParticlesInstance = Instantiate(damageParticles, transform.position, spawnRotation);
     }
 
@@ -110,7 +120,7 @@ public class EnemyController : MonoBehaviour
 
     private void DestroyEnemy()
     {
-        if(alive == false)
-            _dissolve.CallVanish();
+        if(isAlive == false)
+            _dissolve.CallVanish(gameObject);
     }
 }

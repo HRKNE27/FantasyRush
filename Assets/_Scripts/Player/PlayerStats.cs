@@ -1,10 +1,27 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 [CreateAssetMenu(menuName = "Player Movement")]
-public class PlayerMovementStats : ScriptableObject
+public class PlayerStats : ScriptableObject
 {
+    [Header("Offensive Stats")]
+    [Range(0f, 1f)] public float PhysicalDamage = 1f;
+    [Range(0f, 1f)] public float MagicDamage = 1f;
+    [Range(0f, 1f)] public float CritChance = 0.1f;
+    [Range(1f, 2f)] public float CritDamage = 1.5f;
+    [Range(0f, 100f)] public float Mana = 100f;
+    [Range(0f, 100f)] public float ManaRegenerationPerSec = 0.33f;
+
+    [Header("Defensive Stats")]
+    [Range(1, 1000)] public int Health = 100;
+    [Range(0f, 1f)] public float Defence = 0.5f;
+    [Range(0f, 1f)] public float KnockBack = 1f;
+    [Range(0, 100)] public int Stamina = 100;
+    [Range(0f, 1f)] public float StaminaRegenerationPerSec = 0.5f;
+    [Range(0f, 1f)] public float InvincibleTimeFrame = 10f;
+
     [Header("Walk")]
     [Range(0f, 1f)] public float MoveThreshold = 0.25f;
     [Range(1f, 100f)] public float MaxWalkSpeed = 12.5f;
@@ -61,6 +78,8 @@ public class PlayerMovementStats : ScriptableObject
 
     [Header("Dash")]
     [Range(0f, 1f)] public float DashTime = 0.11f;
+    [Range(0f, 1f)] public float DelayedDashInvincibility = 0.05f;
+    [Range(0f, 1f)] public float DashInvincibilityTimeFrame = 0.1f;
     [Range(1f, 200f)] public float DashSpeed = 40f;
     [Range(0f, 1f)] public float TimeBtwDashesOnGround = 0.225f;
     public bool ResetDashOnWallSlide = true;
@@ -70,6 +89,9 @@ public class PlayerMovementStats : ScriptableObject
     [Header("Dash Cancel Time")]
     [Range(0.01f, 5f)] public float DashGravityOnReleaseMultiplier = 1f;
     [Range(0.02f, 0.3f)] public float DashTimeForUpwardsCancel = 0.027f;
+
+    [Header("Attack Movement Values")]
+    [Range(0f, 1f)] public float MovementReductionAttack = 0.5f;
 
     [Header("Debug")]
     public bool DebugShowIsGroundedBox;
