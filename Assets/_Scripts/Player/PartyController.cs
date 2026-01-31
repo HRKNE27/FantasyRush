@@ -14,6 +14,8 @@ public class PartyController : MonoBehaviour
     private Dictionary<GameObject, (PartyMemberStatus, PlayerMovement)> partyManager = new Dictionary<GameObject, (PartyMemberStatus,PlayerMovement)>();
     private int partyManagerCount;
     public static PartyController Instance;
+    private bool canSwap;
+    [SerializeField] private float swapCooldown;
 
     [SerializeField] private GameObject _virtualCamera;
 
@@ -45,6 +47,8 @@ public class PartyController : MonoBehaviour
         partyManager.Add(_partyMemberTwo, (PartyMemberStatus.Left, _partyMemberTwo.GetComponent<PlayerMovement>()));
         partyManager.Add(_partyMemberThree, (PartyMemberStatus.Right,_partyMemberThree.GetComponent<PlayerMovement>()));
         partyManagerCount = partyManager.Count;
+
+        canSwap = true;
     }
 
     private void Start()
@@ -71,40 +75,48 @@ public class PartyController : MonoBehaviour
         switch (partyManagerCount)
         {
             case 3:
-                if (InputManager.SwapLeftPressed)
+                if (canSwap)
                 {
-                    var leftKey = partyManager.FirstOrDefault(x => x.Value.Item1 == PartyMemberStatus.Left).Key;
-                    partyManager[leaderKey] = (PartyMemberStatus.Left, partyManager[leaderKey].Item2);
-                    partyManager[leftKey] = (PartyMemberStatus.Leader, partyManager[leftKey].Item2);
-                    UpdateLeader(newPosition, horizontalVelocity, verticalVelocity);
-                    return;
-                }
-                if (InputManager.SwapRightPressed)
-                {
-                    var rightKey = partyManager.FirstOrDefault(x => x.Value.Item1 == PartyMemberStatus.Right).Key;
-                    partyManager[leaderKey] = (PartyMemberStatus.Right, partyManager[leaderKey].Item2);
-                    partyManager[rightKey] = (PartyMemberStatus.Leader, partyManager[leaderKey].Item2);
-                    UpdateLeader(newPosition, horizontalVelocity, verticalVelocity);
-                    return;
-                }
+                    
+                    if (InputManager.SwapLeftPressed)
+                    {
+                        var leftKey = partyManager.FirstOrDefault(x => x.Value.Item1 == PartyMemberStatus.Left).Key;
+                        partyManager[leaderKey] = (PartyMemberStatus.Left, partyManager[leaderKey].Item2);
+                        partyManager[leftKey] = (PartyMemberStatus.Leader, partyManager[leftKey].Item2);
+                        UpdateLeader(newPosition, horizontalVelocity, verticalVelocity);
+                        StartCoroutine(SwapCooldown(swapCooldown));
+                        return;
+                    }
+                    if (InputManager.SwapRightPressed)
+                    {
+                        var rightKey = partyManager.FirstOrDefault(x => x.Value.Item1 == PartyMemberStatus.Right).Key;
+                        partyManager[leaderKey] = (PartyMemberStatus.Right, partyManager[leaderKey].Item2);
+                        partyManager[rightKey] = (PartyMemberStatus.Leader, partyManager[leaderKey].Item2);
+                        UpdateLeader(newPosition, horizontalVelocity, verticalVelocity);
+                        StartCoroutine(SwapCooldown(swapCooldown));
+                        return;
+                    }              
+                }     
                 break;
             case 2:
-                if(InputManager.SwapLeftPressed || InputManager.SwapRightPressed)
+                if (canSwap)
                 {
-                    var remainderKey = partyManager.FirstOrDefault(x => x.Value.Item1 == PartyMemberStatus.Remainder).Key;
-                    partyManager[leaderKey] = (PartyMemberStatus.Remainder, partyManager[leaderKey].Item2);
-                    partyManager[remainderKey] = (PartyMemberStatus.Leader, partyManager[leaderKey].Item2);
-                    UpdateLeader(newPosition, horizontalVelocity, verticalVelocity);
-                    return;
-                }
+                    if (InputManager.SwapLeftPressed || InputManager.SwapRightPressed)
+                    {
+                        var remainderKey = partyManager.FirstOrDefault(x => x.Value.Item1 == PartyMemberStatus.Remainder).Key;
+                        partyManager[leaderKey] = (PartyMemberStatus.Remainder, partyManager[leaderKey].Item2);
+                        partyManager[remainderKey] = (PartyMemberStatus.Leader, partyManager[leaderKey].Item2);
+                        UpdateLeader(newPosition, horizontalVelocity, verticalVelocity);
+                        StartCoroutine(SwapCooldown(swapCooldown));
+                        return;
+                    }
+                }      
                 break;
             case 1:
                 break;
             default:
                 break;
         }
-        
-        
     }
 
     private void UpdateLeader(Vector2 position,float horizontal, float vertical)
@@ -164,5 +176,12 @@ public class PartyController : MonoBehaviour
                 Debug.Log("Game Over");
                 break;
         }     
+    }
+
+    private IEnumerator SwapCooldown(float cooldownTime)
+    {
+        canSwap = false;
+        yield return new WaitForSeconds(cooldownTime);
+        canSwap = true;
     }
 }

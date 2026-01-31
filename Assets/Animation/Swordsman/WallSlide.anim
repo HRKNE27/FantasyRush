@@ -20,7 +20,7 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: {x: 0.46, y: 0.325, z: 0}
+        value: {x: 0.711, y: 0.325, z: 0}
         inSlope: {x: 0, y: 0, z: 0}
         outSlope: {x: 0, y: 0, z: 0}
         tangentMode: 0
@@ -85,13 +85,13 @@ AnimationClip:
   - serializedVersion: 2
     curve:
     - time: 0
-      value: {fileID: 1678070072, guid: 3190d16e4151e4a479edc6a74316bde8, type: 3}
+      value: {fileID: -86809949, guid: f6763ea2d85790a40b8dc99299a4c97c, type: 3}
     - time: 0.1
-      value: {fileID: -546884645, guid: 3190d16e4151e4a479edc6a74316bde8, type: 3}
+      value: {fileID: 1068985617, guid: f6763ea2d85790a40b8dc99299a4c97c, type: 3}
     - time: 0.2
-      value: {fileID: -1221968424, guid: 3190d16e4151e4a479edc6a74316bde8, type: 3}
+      value: {fileID: 1312887102, guid: f6763ea2d85790a40b8dc99299a4c97c, type: 3}
     - time: 0.3
-      value: {fileID: 1491061521, guid: 3190d16e4151e4a479edc6a74316bde8, type: 3}
+      value: {fileID: 1772947941, guid: f6763ea2d85790a40b8dc99299a4c97c, type: 3}
     attribute: m_Sprite
     path: 
     classID: 212
@@ -150,10 +150,10 @@ AnimationClip:
       isIntCurve: 0
       isSerializeReferenceCurve: 0
     pptrCurveMapping:
-    - {fileID: 1678070072, guid: 3190d16e4151e4a479edc6a74316bde8, type: 3}
-    - {fileID: -546884645, guid: 3190d16e4151e4a479edc6a74316bde8, type: 3}
-    - {fileID: -1221968424, guid: 3190d16e4151e4a479edc6a74316bde8, type: 3}
-    - {fileID: 1491061521, guid: 3190d16e4151e4a479edc6a74316bde8, type: 3}
+    - {fileID: -86809949, guid: f6763ea2d85790a40b8dc99299a4c97c, type: 3}
+    - {fileID: 1068985617, guid: f6763ea2d85790a40b8dc99299a4c97c, type: 3}
+    - {fileID: 1312887102, guid: f6763ea2d85790a40b8dc99299a4c97c, type: 3}
+    - {fileID: 1772947941, guid: f6763ea2d85790a40b8dc99299a4c97c, type: 3}
   m_AnimationClipSettings:
     serializedVersion: 2
     m_AdditiveReferencePoseClip: {fileID: 0}
@@ -181,7 +181,7 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 0.46
+        value: 0.711
         inSlope: 0
         outSlope: 0
         tangentMode: 136

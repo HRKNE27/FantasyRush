@@ -45,11 +45,13 @@ public class PartyMemberController : MonoBehaviour
         {
             currentHealth -= incomingDamage;
             SpawnDamageParticles(attackDirection);
-            // CameraShakeManager.Instance.CameraShake(_impulseSource);
+            _playerMovement.CallKnockback(attackDirection, Vector2.zero);
             CameraShakeManager.Instance.ScreenShakeFromProfile(screenShakeProfile, _impulseSource);
+            //Change to player stats later
+            StartCoroutine(StunCooldown(1f));
             InitiateInvincibility(playerStats.InvincibleTimeFrame);
         }
-        
+        // TODO: Call slowdown time here since they dodged while invincible
     }
 
     public void CheckHealth()
@@ -86,7 +88,6 @@ public class PartyMemberController : MonoBehaviour
     private IEnumerator InvincibilityCooldown(float timeFrame)
     {
         iFrame = true;
-        Debug.Log("sadjlaskjlksajlkjsalkdslka");
         yield return new WaitForSeconds(timeFrame);
         iFrame = false;
     }
@@ -95,6 +96,17 @@ public class PartyMemberController : MonoBehaviour
     {
         iFrame = isInvincible;
     }
+
+    private IEnumerator StunCooldown(float duration)
+    {
+        _playerMovement._canAct = false;
+        _anim.SetBool("Stunned", true);
+        yield return new WaitForSeconds(duration);
+        _anim.SetBool("Stunned", false);
+        _playerMovement._canAct = true;
+        // _anim.Play("Idle");
+    }
+
 
     private IEnumerator DeathSequence()
     {

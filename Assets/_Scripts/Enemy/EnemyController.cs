@@ -11,6 +11,7 @@ public class EnemyController : MonoBehaviour
     [SerializeField] private EnemyStats enemyStats;
     [SerializeField] private ScreenShakeProfile screenShakeProfile;
     [SerializeField] private ParticleSystem damageParticles;
+    [SerializeField] private SetUpParry setUpParry;
 
     private Animator _anim;
     private EnemyAI _enemyAI;
@@ -46,19 +47,23 @@ public class EnemyController : MonoBehaviour
     public void TakeDamage(int incomingDamage, Vector2 attackDirection)
     {
         int damageTaken = (int) Mathf.Floor((float)incomingDamage * enemyStats.BarrierDamageReduction);
-        if(currentBarrier > 0)
+        bool parrySuccess = setUpParry.CheckSuccess();
+        if (parrySuccess)
         {
-            currentHealth -= damageTaken;
-            currentBarrier -= damageTaken;
-            // Debug.Log(transform.gameObject.name + " has taken " + damageTaken.ToString());
+            _enemyAI.CallKnockback(attackDirection, Vector2.up);
+        }
+        if (currentBarrier <= 0 || parrySuccess)
+        {
+            currentHealth -= incomingDamage;
         }
         else
         {
-            currentHealth -= incomingDamage;
-            // Debug.Log(transform.gameObject.name + " has taken " + incomingDamage.ToString());
+            currentHealth -= damageTaken;
+            currentBarrier -= damageTaken;
         }
-        SpawnDamageParticles(attackDirection);
-        // CameraShakeManager.Instance.CameraShake(_impulseSource);
+        if (parrySuccess)
+            StartCoroutine(StunCooldown(1.0f));
+        SpawnDamageParticles(attackDirection);     
         CameraShakeManager.Instance.ScreenShakeFromProfile(screenShakeProfile, _impulseSource);
     }
 
@@ -66,7 +71,8 @@ public class EnemyController : MonoBehaviour
     {
         if (currentBarrier <= 0)
         {
-            StartCoroutine(StunCooldown());         
+            StartCoroutine(StunCooldown(enemyStats.StunDuration));
+            StartCoroutine(BarrierReset());
         }
     }
 
@@ -83,7 +89,6 @@ public class EnemyController : MonoBehaviour
 
     private void SpawnDamageParticles(Vector2 attackDirection)
     {
-        Debug.Log(attackDirection);
         Quaternion spawnRotation;
         if (attackDirection.x > 0)
         {
@@ -97,15 +102,20 @@ public class EnemyController : MonoBehaviour
         damageParticlesInstance = Instantiate(damageParticles, transform.position, spawnRotation);
     }
 
-    private IEnumerator StunCooldown()
+    private IEnumerator StunCooldown(float duration)
     {
         _enemyAI.canAct = false;
         _anim.SetBool("Stunned",true);
-        yield return new WaitForSeconds(enemyStats.StunDuration);
-        currentBarrier = enemyStats.BarrierThreshold;
+        yield return new WaitForSeconds(duration);
         _anim.SetBool("Stunned", false);
         _enemyAI.canAct = true;
         _anim.Play("Walk");
+    }
+
+    private IEnumerator BarrierReset()
+    {
+        yield return new WaitForSeconds(enemyStats.StunDuration);
+        currentBarrier = enemyStats.BarrierThreshold;
     }
 
     private IEnumerator DeathSequence()

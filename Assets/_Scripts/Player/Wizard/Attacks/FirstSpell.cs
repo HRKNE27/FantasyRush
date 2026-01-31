@@ -2,16 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Parry : MeleeBaseState
+public class FirstSpell : WizardBaseState
 {
     public override void OnEnter(StateMachine stateMachine)
     {
         base.OnEnter(stateMachine);
 
-        _attackIndex = 12;
-        _duration = 1.0f;
+        _attackIndex = 1;
+        _duration = 0.5f;
         _animator.SetTrigger("Attack" + _attackIndex);
-        _playerMovement.IsGroundAttacking(true);
         Debug.Log("Player attack " + _attackIndex + " launched");
     }
 
@@ -20,10 +19,8 @@ public class Parry : MeleeBaseState
     {
         base.OnUpdate();
 
-        // TODO: Add counter later
         if (fixedtime >= _duration)
         {
-            _playerMovement.IsGroundAttacking(false);
             stateMachine.SetNextStateToMain();
         }
     }

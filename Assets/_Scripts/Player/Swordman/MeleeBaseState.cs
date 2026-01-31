@@ -67,11 +67,11 @@ public class MeleeBaseState : State
                     // Debug.Log("Enemy has taken: " + _attackIndex + "damage");
                     if (_playerMovement._isFacingRight)
                     {
-                        enemyController.TakeDamage(_attackDamage, Vector2.right);
+                        enemyController.TakeDamage(_attackDamage, Vector2.right.normalized);
                     }
                     else
                     {
-                        enemyController.TakeDamage(_attackDamage, Vector2.left);
+                        enemyController.TakeDamage(_attackDamage, Vector2.left.normalized);
                     }
                     
                     _collidersDamaged.Add(collidersToDamage[i]);

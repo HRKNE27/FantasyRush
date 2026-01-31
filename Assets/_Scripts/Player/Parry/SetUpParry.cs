@@ -41,7 +41,8 @@ public class SetUpParry : MonoBehaviour
     {
         distanceTravled = 0f;
         elapsedTime = 0f;
-        ResetParryBar(); 
+        ResetParryBar();
+        StopAllCoroutines();
     }
 
     private void Update()
@@ -68,19 +69,24 @@ public class SetUpParry : MonoBehaviour
         parryTimeSet = selectedIndexes;
     }
 
-    private void CheckSuccess()
+    public bool CheckSuccess()
     {
-        StopCoroutine(moveCoroutine);
+        if(moveCoroutine != null)
+            StopCoroutine(moveCoroutine);
         float parryPercentage = distanceTravled / Vector3.Distance(pointA.transform.position, pointB.transform.position);
         foreach (int x in parryTimeSet)
         {
             float startPercent = (x - 1) / 10f;
             float endPercent = x / 10f;
-            if (CheckSuccess(parryPercentage, startPercent, endPercent))
-                return;
+            if (CheckSuccessHelper(parryPercentage, startPercent, endPercent))
+            {
+                enemyAI.ResetParry();
+                return true;
+            }
         }
-        moveCoroutine = StartCoroutine(MoveParryCounter());
-            
+        if(moveCoroutine != null)
+            moveCoroutine = StartCoroutine(MoveParryCounter());
+        return false;
     }
 
     IEnumerator MoveParryCounter()
@@ -113,7 +119,7 @@ public class SetUpParry : MonoBehaviour
         }
     }
 
-    public static bool CheckSuccess(float number, float min, float max)
+    public static bool CheckSuccessHelper(float number, float min, float max)
     {
         return number >= min && number <= max;
     }

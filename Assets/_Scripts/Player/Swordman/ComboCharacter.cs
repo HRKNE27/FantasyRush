@@ -35,7 +35,7 @@ public class ComboCharacter : MonoBehaviour
                 _playerMovement.IsAirAttacking(true);
                 _meleeStateMachine.SetNextState(new AerialSlashDown());
             }
-            else if(!_playerMovement._isGrounded && Mathf.Abs(InputManager.Movement.x) == 1.0f)
+            else
             {
                 _playerMovement.IsAirAttacking(true);
                 _meleeStateMachine.SetNextState(new AerialSlashForward());
@@ -70,7 +70,7 @@ public class ComboCharacter : MonoBehaviour
             if (_playerMovement._isGrounded)
             {
                 _playerMovement.IsGroundAttacking(true);
-                _meleeStateMachine.SetNextState(new Parry());
+                _meleeStateMachine.SetNextState(new BladeFlurry());
             }
         }
     }

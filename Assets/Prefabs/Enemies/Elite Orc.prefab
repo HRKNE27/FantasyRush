@@ -272,6 +272,33 @@ MonoBehaviour:
   jumpEnabled: 0
   canAct: 0
   _hitCollider: {fileID: 1708569767436637294}
+  knockbackTime: 0.1
+  hitDirectionForce: 15
+  constantForce: 2
+  knockbackAnimationCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
   parryCanvas: {fileID: 4870176494813297448}
 --- !u!50 &8800069494887797103
 Rigidbody2D:
@@ -350,6 +377,7 @@ MonoBehaviour:
   enemyStats: {fileID: 11400000, guid: b2b7e002f1ed9e24687436b0640d7fc0, type: 2}
   screenShakeProfile: {fileID: 11400000, guid: 0943266db6641cd4ebd1a4c242fbde6b, type: 2}
   damageParticles: {fileID: 3590559891664853555, guid: f0ca9b1ecd398034786a1c939bdd775b, type: 3}
+  setUpParry: {fileID: 2057778468901339640}
 --- !u!114 &7164230257373000612
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -697,6 +725,17 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 6178063437505480350}
   m_SourcePrefab: {fileID: 100100000, guid: 79d9ce5338063df41813d6b23bd99c64, type: 3}
+--- !u!114 &2057778468901339640 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3169085859321277242, guid: 79d9ce5338063df41813d6b23bd99c64, type: 3}
+  m_PrefabInstance: {fileID: 3995933466532326082}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4870176494813297448}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 12c578c3b41bd71499b570cac741eb7c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &4870176494813297448 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8422364514439959018, guid: 79d9ce5338063df41813d6b23bd99c64, type: 3}

@@ -3,7 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting;
+#if UNITY_EDITOR
 using UnityEditor.EditorTools;
+#endif
 using UnityEngine;
 
 public class EnemyAI : Monster
@@ -39,6 +41,12 @@ public class EnemyAI : Monster
     [SerializeField] private Collider2D _hitCollider;
     private List<Collider2D> _collidersDamaged;
 
+    [Header("Knockback")]
+    [SerializeField] private float knockbackTime;
+    [SerializeField] private float hitDirectionForce;
+    [SerializeField] private float constantForce;
+    public bool isBeingKnockedBack { get; private set; }
+
     [Header("Misc")]
     [SerializeField] private GameObject parryCanvas;
 
@@ -46,7 +54,9 @@ public class EnemyAI : Monster
     private Path path;
     private int currentWaypoint = 0;
     private bool isJumping, isInAir, onCooldown;
+    private Coroutine knockbackCoroutine;
     private Animator _anim;
+    private Rigidbody2D _rb;
     Seeker seeker;
     #endregion
 
@@ -55,6 +65,7 @@ public class EnemyAI : Monster
         base.Start();
         seeker = GetComponent<Seeker>();
         _anim = GetComponent<Animator>();
+        _rb = GetComponent<Rigidbody2D>();
         _collidersDamaged = new List<Collider2D>();
 
         movingRight = true;
@@ -119,10 +130,8 @@ public class EnemyAI : Monster
             int colliderCount = Physics2D.OverlapCollider(_hitCollider, filter, collidersToDamage);
             for (int i = 0; i < colliderCount; i++)
             {
-                
-                if (collidersToDamage[i].transform.parent.gameObject.layer == LayerMask.NameToLayer("Player"))
+                if (collidersToDamage[i].transform.parent.gameObject.layer == LayerMask.NameToLayer("Player") && _anim.GetFloat("AttackWindow.Open") > 0)
                 {
-                    Debug.Log(FindParent(collidersToDamage[i])?.name);
                     if (movingRight)
                     {
                         FindParent(collidersToDamage[i]).GetComponent<PartyMemberController>().TakeDamage(enemyStats.Damage,Vector2.right);
@@ -131,7 +140,7 @@ public class EnemyAI : Monster
                     {
                         FindParent(collidersToDamage[i]).GetComponent<PartyMemberController>().TakeDamage(enemyStats.Damage,Vector2.left);
                     }
-                    // FindParent(collidersToDamage[i]).GetComponent<PartyMemberController>().TakeDamage();
+
                     yield break;
                 }
             }
@@ -139,6 +148,11 @@ public class EnemyAI : Monster
             yield return null;
         }
 
+    }
+
+    public void ResetParry()
+    {
+        parryCanvas.SetActive(false);
     }
 
     private GameObject FindParent(Collider2D collider2D)
@@ -257,6 +271,32 @@ public class EnemyAI : Monster
     public void SetTarget(Transform newTarget)
     {
         target = newTarget;
+    }
+
+    IEnumerator KnockbackAction(Vector2 hitDirection, Vector2 constantForceDirection)
+    {
+        isBeingKnockedBack = true;
+        Vector2 _hitForce;
+        Vector2 _constantForce;
+        Vector2 _knockbackForce;
+
+        _hitForce = hitDirection * hitDirectionForce;
+        _constantForce = constantForce * constantForceDirection;
+
+        float elapsedTime = 0f;
+        while(elapsedTime < knockbackTime)
+        {
+            elapsedTime += Time.deltaTime;
+            _knockbackForce = _hitForce + _constantForce;
+            rb.velocity = _knockbackForce;
+            yield return new WaitForFixedUpdate();
+        }
+        isBeingKnockedBack = false;
+    }
+
+    public void CallKnockback(Vector2 hitDirection, Vector2 consantForceDirection)
+    {
+        knockbackCoroutine = StartCoroutine(KnockbackAction(hitDirection, consantForceDirection));
     }
 
     IEnumerator JumpCoolDown()

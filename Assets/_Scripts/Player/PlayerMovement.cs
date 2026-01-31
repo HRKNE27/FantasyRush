@@ -16,6 +16,14 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private GameObject _afterImageGameObject;
     private bool _canCreateAfterImage;
 
+    [Header("Knockback")]
+    [SerializeField] private float knockbackTime;
+    [SerializeField] private float hitDirectionForce;
+    [SerializeField] private float constantForce;
+    [SerializeField] private AnimationCurve knockbackCurve;
+    private Coroutine knockbackCoroutine;
+    public bool isBeingKnockedBack { get; private set; }
+
     private CinemachineImpulseSource _impulseSource;
     private Animator _animator;
     private Rigidbody2D _rb;
@@ -104,11 +112,12 @@ public class PlayerMovement : MonoBehaviour
         _isAirAttacking = false;
         _canAct = true;
         _canCreateAfterImage = true;
+        isBeingKnockedBack = false;
     }
 
     private void Update()
     {
-        if (_canAct)
+        if (_canAct && !isBeingKnockedBack)
         {
             CountTimers();
             JumpChecks();
@@ -121,7 +130,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (_canAct)
+        if (_canAct && !isBeingKnockedBack)
         {
             CollisionChecks();
             Jump();
@@ -164,6 +173,7 @@ public class PlayerMovement : MonoBehaviour
             {
                 GameObject afterImageObj = ObjectPoolManager.SpawnObject(_afterImageGameObject, gameObject.transform.position, gameObject.transform.rotation, ObjectPoolManager.PoolType.Sprites);
                 afterImageObj.GetComponent<SpriteRenderer>().sprite = _spriteRenderer.sprite;
+                afterImageObj.gameObject.transform.localScale = transform.localScale;
                 StartCoroutine(CreateAfterImageCooldown());
             }
         }
@@ -182,7 +192,7 @@ public class PlayerMovement : MonoBehaviour
     private IEnumerator CreateAfterImageCooldown()
     {
         _canCreateAfterImage = false;
-        yield return new WaitForSeconds(0.01f);
+        yield return new WaitForSeconds(0.06f);
         _canCreateAfterImage = true;
     }
 
@@ -857,6 +867,38 @@ public class PlayerMovement : MonoBehaviour
 
     #endregion
 
+    #region Knockback
+    IEnumerator KnockbackAction(Vector2 hitDirection, Vector2 constantForceDirection)
+    {
+        isBeingKnockedBack = true;
+        Vector2 _hitForce;
+        Vector2 _constantForce;
+        Vector2 _knockbackForce;
+
+        float _time = 0f;
+
+        
+        _constantForce = constantForce * constantForceDirection;
+
+        float elapsedTime = 0f;
+        while (elapsedTime < knockbackTime)
+        {
+            elapsedTime += Time.fixedDeltaTime;
+            _time += Time.fixedDeltaTime;
+            _hitForce = hitDirection * hitDirectionForce * knockbackCurve.Evaluate(_time);
+            _knockbackForce = _hitForce + _constantForce;
+            _rb.velocity = _knockbackForce;
+            yield return new WaitForFixedUpdate();
+        }
+        isBeingKnockedBack = false;
+    }
+
+    public void CallKnockback(Vector2 hitDirection, Vector2 consantForceDirection)
+    {
+        knockbackCoroutine = StartCoroutine(KnockbackAction(hitDirection, consantForceDirection));
+    }
+    #endregion
+
     #region Collision Checks
     private void IsGrounded()
     {
@@ -923,13 +965,13 @@ public class PlayerMovement : MonoBehaviour
     public void IsGroundAttacking(bool isGroundAttacking)
     {
         _isGroundAttacking = isGroundAttacking;
-        Debug.Log("Is Ground Attacking: " + _isGroundAttacking.ToString());
+        // Debug.Log("Is Ground Attacking: " + _isGroundAttacking.ToString());
     }
 
     public void IsAirAttacking(bool isAirAttacking)
     {
         _isAirAttacking = isAirAttacking;
-        Debug.Log("Is Air Attacking: " + _isAirAttacking.ToString());
+        // Debug.Log("Is Air Attacking: " + _isAirAttacking.ToString());
     }
 
     private void CollisionChecks()
